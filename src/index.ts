@@ -1,7 +1,7 @@
 import * as net from 'net';
 import { Client as SshClient, ConnectConfig as SshConnectConfig } from 'ssh2';
 import { SocksClient, SocksClientOptions } from 'socks';
-import logger from './logger';
+// import logger from './logger';
 import { getAvailablePort } from './utils';
 
 export enum STATUS {
@@ -160,7 +160,7 @@ class SshTunnel {
         };
         sshClient
           .on('ready', () => {
-            logger.purple('ssh connection ready');
+            // logger.purple('ssh connection ready');
             // 清空上一个 ssh client 的监听函数，销毁上一个 sshClient
             this.sshClient?.removeAllListeners();
             this.sshClient?.destroy();
@@ -208,7 +208,7 @@ class SshTunnel {
     }
     const alive = await this.throttleCheckAlive();
     if (!alive) {
-      logger.white('ssh connection was hung up, reconnecting...');
+      // logger.white('ssh connection was hung up, reconnecting...');
       await this.createSshClient();
     }
     let res = '';
@@ -323,7 +323,7 @@ class SshTunnel {
     if (this.proxyList.find(item => item.id === id)) {
       throw new Error(`id ${id} is duplicated, use another one please`);
     }
-    logger.bgBlack(this.genSshCommand(proxyConfig));
+    // logger.bgBlack(this.genSshCommand(proxyConfig));
     if (!this.sshClient) {
       await this.createSshClient();
     }
@@ -338,7 +338,7 @@ class SshTunnel {
         try {
           const alive = await this.throttleCheckAlive();
           if (!alive) {
-            logger.white('ssh connection was hung up, reconnecting...');
+            // logger.white('ssh connection was hung up, reconnecting...');
             await this.createSshClient();
           }
           // 并发 exec(`nc ip port`) 数量在超过 服务器 ssh 设置的最大 channel 数时（一般是 10），会有 Channel open failure 的问题
@@ -352,11 +352,11 @@ class SshTunnel {
               destPort,
               (err, stream) => {
                 if (err) {
-                  logger.warn(`${id} forwardout err: `, err.message);
+                  // logger.warn(`${id} forwardout err: `, err.message);
                   if (err.message?.includes('Connection refused')) {
-                    logger.bgRed(
-                      `朋友，检查一下目标服务器端口 ${id} ${destHost}:${destPort} 是否正常`,
-                    );
+                    // logger.bgRed(
+                      // `朋友，检查一下目标服务器端口 ${id} ${destHost}:${destPort} 是否正常`,
+                    // );
                   }
                   socket.end();
                   return;
@@ -394,10 +394,10 @@ class SshTunnel {
             throw new Error();
           }
         } catch (e) {
-          logger.warn(e.message);
-          logger.white('ssh connection was hung up, reconnecting...');
+          // logger.warn(e.message);
+          // logger.white('ssh connection was hung up, reconnecting...');
           this.createSshClient().catch(err => {
-            logger.warn(err.message);
+            // logger.warn(err.message);
             socket.end();
           });
         }
@@ -411,7 +411,7 @@ class SshTunnel {
       }).on('listening', () => {
         // console.log(`listening ${localPort}`);
       }).on('close', () => {
-        logger.gray(`proxy server ${id} is closed`);
+        // logger.gray(`proxy server ${id} is closed`);
       });
     this.proxyList.push({
       localPort, 
@@ -421,7 +421,7 @@ class SshTunnel {
       id,
       type: 'out'
     });
-    logger.startLine().mint('proxy server ').blue(id).mint(` is listening on 127.0.0.1:${localPort} => ${destHost}:${destPort}`).endLine();
+    // logger.startLine().mint('proxy server ').blue(id).mint(` is listening on 127.0.0.1:${localPort} => ${destHost}:${destPort}`).endLine();
     return proxyConfig;
   };
 
@@ -521,4 +521,4 @@ class SshTunnel {
 
 }
 
-export { logger, SshTunnel }
+export { SshTunnel }
